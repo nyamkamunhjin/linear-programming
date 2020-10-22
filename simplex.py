@@ -13,10 +13,12 @@ p = 2x + 5y  --->  [2, 5]
 
 """
 import numpy as np
+from tabulate import tabulate
+import pandas as pd
 
 # constraints = [[2, 1, "<=", 5], [1, 2, "<=", 4]]
 
-testConstraints = [[2, 1], [1, -2]]
+testConstraints = [[2, 1], [1, 2]]
 testAnswer = [5, 4]
 slacks = [1, 1]
 profit = [2, 5]
@@ -61,7 +63,7 @@ def find_pivot(table):
             min = divided_matrix[i]
             index = i
 
-    if min < 0:
+    if index < 0:
         raise Exception("Unbounded")
     # print()
     # get 2d pivot index
@@ -101,6 +103,12 @@ def simplex(constraints, answers, slacks, profit, goal):
 
 
 table = simplex(testConstraints, testAnswer, slacks, profit, "maximize")
-print(table)
-
+# print(
+#     tabulate(
+#         table,
+#         headers=["x1", "x2", "s1", "s2", "p", "_"],
+#     )
+# )
+df = pd.DataFrame(data=table, columns=["x1", "x2", "s1", "s2", "p", "_"])
+df
 # %%
