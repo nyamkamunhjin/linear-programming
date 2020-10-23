@@ -18,11 +18,10 @@ import pandas as pd
 
 # constraints = [[2, 1, "<=", 5], [1, 2, "<=", 4]]
 
-testConstraints = [[2, 1], [1, 2]]
-testAnswer = [5, 4]
-slacks = [1, 1]
-profit = [2, 5]
-goal = "maximize"
+
+def print_table(table, headers):
+    df = pd.DataFrame(table, columns=headers[0], index=headers[1])
+    print(df)
 
 
 def create_table(constraints, answers, slacks, profit):
@@ -36,11 +35,11 @@ def create_table(constraints, answers, slacks, profit):
 
     # add columns
     table = np.c_[table, arr, testAnswer + [0]]
-    print(table)
+
     return table
 
 
-def find_pivot(table):
+def find_pivot(table, headers):
     print("finding pivot")
     # find most negative number index from bottom row
     min_idx = np.argmin(table[table.shape[0] - 1])
@@ -69,9 +68,12 @@ def find_pivot(table):
     # get 2d pivot index
 
     pivot_idx = index, min_idx
-    # pivot_idx = (
-    #     np.where(divided_matrix > 0) and np.where(divided_matrix == min(divided_matrix))
-    # )[0], min_idx
+
+    # swap columns, index
+    colNames, rowNames = headers
+
+    rowNames[min_idx] = colNames[index]
+
     print(pivot_idx)
     return pivot_idx
 
@@ -79,7 +81,7 @@ def find_pivot(table):
 def row_operation(table, pivot_idx):
     # make pivot entry 1
     table[pivot_idx[0]] = table[pivot_idx[0]] / table[pivot_idx]
-    print(table)
+
     # make other rows pivot col 0
     print("make other rows pivot col 0")
 
@@ -92,23 +94,53 @@ def row_operation(table, pivot_idx):
     return table
 
 
-def simplex(constraints, answers, slacks, profit, goal):
+def simplex(constraints, answers, slacks, profit, headers, goal):
     table = create_table(constraints, answers, slacks, profit)
+    print_table(table, headers)
 
     while np.min(table[table.shape[0] - 1]) < 0:
-        pivot_idx = find_pivot(table)
+        pivot_idx = find_pivot(table, headers)
         table = row_operation(table, pivot_idx)
+        print_table(table, headers)
+
+    colNames, rowNames = headers
+
+    answer = "Answer: "
+    for i in range(len(colNames)):
+        if colNames[i][0] == "x":
+            if colNames[i] in rowNames:
+
+                index = rowNames.index(colNames[i])
+                answer = (
+                    answer
+                    + colNames[i]
+                    + " = "
+                    + str(round(table[index, table.shape[1] - 1]))
+                    + ", "
+                )
+
+            else:
+                answer = answer + colNames[i] + " = 0, "
+
+    print(answer)
 
     return table
 
 
-table = simplex(testConstraints, testAnswer, slacks, profit, "maximize")
-# print(
-#     tabulate(
-#         table,
-#         headers=["x1", "x2", "s1", "s2", "p", "_"],
-#     )
-# )
-df = pd.DataFrame(data=table, columns=["x1", "x2", "s1", "s2", "p", "_"])
-df
+# %%
+testConstraints = [[2, 1], [1, 2]]
+testAnswer = [5, 4]
+slacks = [1, 1]
+profit = [2, 5]
+goal = "maximize"
+headers = ["x1", "x2", "s1", "s2", "p", "_"], ["s1", "s2", "p"]
+table = simplex(testConstraints, testAnswer, slacks, profit, headers, "maximize")
+# %%
+testConstraints = [[2, 4], [3, 2]]
+testAnswer = [220, 150]
+slacks = [1, 1]
+profit = [4, 3]
+goal = "maximize"
+headers = ["x1", "x2", "s1", "s2", "p", "_"], ["s1", "s2", "p"]
+simplex(testConstraints, testAnswer, slacks, profit, headers, "maximize")
 # %%
