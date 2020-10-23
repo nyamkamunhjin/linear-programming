@@ -1,4 +1,4 @@
-#%%
+# %%
 
 """
 2x + y <= 5
@@ -13,7 +13,6 @@ p = 2x + 5y  --->  [2, 5]
 
 """
 import numpy as np
-from tabulate import tabulate
 import pandas as pd
 
 # constraints = [[2, 1, "<=", 5], [1, 2, "<=", 4]]
@@ -53,7 +52,7 @@ def find_pivot(table, headers):
     b = table[: table.shape[0] - 1, table.shape[1] - 1]
 
     divided_matrix = b / a
-    print(divided_matrix)
+    # print(divided_matrix)
 
     min = max(divided_matrix)
     index = -1
@@ -72,7 +71,7 @@ def find_pivot(table, headers):
     # swap columns, index
     colNames, rowNames = headers
 
-    rowNames[min_idx] = colNames[index]
+    rowNames[index] = colNames[min_idx]
 
     print(pivot_idx)
     return pivot_idx
@@ -88,7 +87,8 @@ def row_operation(table, pivot_idx):
     subtract = np.array(table[:, pivot_idx[1]])
     subtract[pivot_idx[0]] = 0
 
-    subtractRow = np.dot(np.diag(subtract), np.tile(table[pivot_idx[0]], (3, 1)))
+    subtractRow = np.dot(np.diag(subtract), np.tile(
+        table[pivot_idx[0]], (table.shape[0], 1)))
     table = table - subtractRow
 
     return table
@@ -134,7 +134,8 @@ slacks = [1, 1]
 profit = [2, 5]
 goal = "maximize"
 headers = ["x1", "x2", "s1", "s2", "p", "_"], ["s1", "s2", "p"]
-table = simplex(testConstraints, testAnswer, slacks, profit, headers, "maximize")
+table = simplex(testConstraints, testAnswer,
+                slacks, profit, headers, "maximize")
 # %%
 testConstraints = [[2, 4], [3, 2]]
 testAnswer = [220, 150]
@@ -142,5 +143,16 @@ slacks = [1, 1]
 profit = [4, 3]
 goal = "maximize"
 headers = ["x1", "x2", "s1", "s2", "p", "_"], ["s1", "s2", "p"]
-simplex(testConstraints, testAnswer, slacks, profit, headers, "maximize")
+table = simplex(testConstraints, testAnswer,
+                slacks, profit, headers, "maximize")
+# %%
+testConstraints = [[5, 3, 2], [4, 4, 4], [4, 2, 5]]
+testAnswer = [60, 72, 100]
+slacks = [1, 1, 1]
+profit = [10, 5, 8]
+# goal = "maximize"
+headers = ["x1", "x2", "x3", "s1", "s2",
+           "s3", "p", "_"], ["s1", "s2", "s3", "p"]
+table = simplex(testConstraints, testAnswer,
+                slacks, profit, headers, "maximize")
 # %%
