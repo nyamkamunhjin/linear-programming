@@ -1,17 +1,6 @@
 # %%
 
-"""
-2x + y <= 5
-x + 2y <= 4
-x => 0, y => 0
 
-Maximize: p = 2x + 5y
-
-2x + y <= 5  --->  [2, 1, '<=', 5]
-x + 2y <= 4  --->  [1, 2, '<=', 4]
-p = 2x + 5y  --->  [2, 5]                
-
-"""
 import numpy as np
 import pandas as pd
 
@@ -128,6 +117,19 @@ def simplex(constraints, answers, slacks, profit, headers, goal):
 
 
 # %%
+"""
+2x + y <= 5
+x + 2y <= 4
+x => 0, y => 0
+
+Maximize: p = 2x + 5y
+
+2x + y <= 5  --->  [2, 1]
+x + 2y <= 4  --->  [1, 2]
+p = 2x + 5y  --->  [2, 5]                
+
+"""
+
 testConstraints = [[2, 1], [1, 2]]
 testAnswer = [5, 4]
 slacks = [1, 1]
