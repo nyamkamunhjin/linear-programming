@@ -4,10 +4,9 @@
 import numpy as np
 import pandas as pd
 
-# constraints = [[2, 1, "<=", 5], [1, 2, "<=", 4]]
-
 
 def print_table(table, headers):
+    # print(table)
     df = pd.DataFrame(table, columns=headers[0], index=headers[1])
     print(df)
 
@@ -24,7 +23,21 @@ def create_table(constraints, answers, slacks, profit):
     # add columns
     table = np.c_[table, arr, testAnswer + [0]]
 
-    return table
+    # create headers
+    rowNames = []
+    colNames = []
+
+    for i in range(1, len(constraints[0]) + 1):
+        colNames = colNames + ["x" + str(i)]
+
+    for i in range(1, len(constraints) + 1):
+        rowNames = rowNames + ["s" + str(i)]
+
+    rowNames = rowNames + ["p"]
+    colNames = colNames + rowNames + ["_"]
+
+    print((colNames, rowNames))
+    return table, (colNames, rowNames)
 
 
 def find_pivot(table, headers):
@@ -76,15 +89,16 @@ def row_operation(table, pivot_idx):
     subtract = np.array(table[:, pivot_idx[1]])
     subtract[pivot_idx[0]] = 0
 
-    subtractRow = np.dot(np.diag(subtract), np.tile(
-        table[pivot_idx[0]], (table.shape[0], 1)))
+    subtractRow = np.dot(
+        np.diag(subtract), np.tile(table[pivot_idx[0]], (table.shape[0], 1))
+    )
     table = table - subtractRow
 
     return table
 
 
-def simplex(constraints, answers, slacks, profit, headers, goal):
-    table = create_table(constraints, answers, slacks, profit)
+def simplex(constraints, answers, slacks, profit, goal="maximize"):
+    table, headers = create_table(constraints, answers, slacks, profit)
     print_table(table, headers)
 
     while np.min(table[table.shape[0] - 1]) < 0:
@@ -134,27 +148,26 @@ testConstraints = [[2, 1], [1, 2]]
 testAnswer = [5, 4]
 slacks = [1, 1]
 profit = [2, 5]
-goal = "maximize"
-headers = ["x1", "x2", "s1", "s2", "p", "_"], ["s1", "s2", "p"]
-table = simplex(testConstraints, testAnswer,
-                slacks, profit, headers, "maximize")
+
+table = simplex(testConstraints, testAnswer, slacks, profit)
 # %%
 testConstraints = [[2, 4], [3, 2]]
 testAnswer = [220, 150]
 slacks = [1, 1]
 profit = [4, 3]
-goal = "maximize"
-headers = ["x1", "x2", "s1", "s2", "p", "_"], ["s1", "s2", "p"]
-table = simplex(testConstraints, testAnswer,
-                slacks, profit, headers, "maximize")
+
+table = simplex(testConstraints, testAnswer, slacks, profit)
 # %%
 testConstraints = [[5, 3, 2], [4, 4, 4], [4, 2, 5]]
 testAnswer = [60, 72, 100]
 slacks = [1, 1, 1]
 profit = [10, 5, 8]
-# goal = "maximize"
-headers = ["x1", "x2", "x3", "s1", "s2",
-           "s3", "p", "_"], ["s1", "s2", "s3", "p"]
-table = simplex(testConstraints, testAnswer,
-                slacks, profit, headers, "maximize")
+table = simplex(testConstraints, testAnswer, slacks, profit)
+# %%
+testConstraints = [[2, 1], [0, 0], [5, 4], [0, 2], [0, 0]]
+testAnswer = [600, 225, 1000, 150, 0]
+slacks = [1, 1, 1, -1, -1]
+profit = [3, 4]
+table = simplex(testConstraints, testAnswer, slacks, profit)
+
 # %%
