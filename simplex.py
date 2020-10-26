@@ -11,32 +11,47 @@ def print_table(table, headers):
     print(df)
 
 
-def create_table(constraints, answers, slacks, profit):
+def create_table(constraints, answers, slacks, profit, goal):
     print("creating table")
     # add profit (x1, x2, ...) to table row
-    table = np.r_[np.array(constraints), np.array([profit]) * -1]
+    table = np.r_[np.array(constraints), np.array([profit])]
 
     # slack identity matrix
     arr = np.eye(table.shape[0])
     np.fill_diagonal(arr, slacks + [1])
 
     # add columns
-    table = np.c_[table, arr, testAnswer + [0]]
+    # table = np.c_[table, arr, answers + [0]]
+    table = np.c_[table, answers + [0]]
+
+    if goal == "minimize":
+        table = np.transpose(table)
+        arr[: arr.shape[0] - 1, : arr.shape[1] - 1] = np.negative(
+            arr[: arr.shape[0] - 1, : arr.shape[1] - 1]
+        )
+
+    table[table.shape[0] - 1, : table.shape[1] - 1] = np.negative(
+        table[table.shape[0] - 1, : table.shape[1] - 1]
+    )
+
+    print(table)
 
     # create headers
     rowNames = []
     colNames = []
 
-    for i in range(1, len(constraints[0]) + 1):
+    for i in range(1, table.shape[1]):
         colNames = colNames + ["x" + str(i)]
 
-    for i in range(1, len(constraints) + 1):
+    for i in range(1, table.shape[0]):
         rowNames = rowNames + ["s" + str(i)]
 
     rowNames = rowNames + ["p"]
     colNames = colNames + rowNames + ["_"]
 
-    print((colNames, rowNames))
+    table = np.c_[table[:, : table.shape[1] - 1], arr, table[:, table.shape[1] - 1]]
+
+    # print((colNames, rowNames))
     return table, (colNames, rowNames)
 
 
@@ -97,8 +112,45 @@ def row_operation(table, pivot_idx):
     return table
 
 
+def print_answer(headers, table, goal):
+    colNames, rowNames = headers
+    answer = "Answer: "
+
+    if goal == "maximize":
+        for i in range(len(colNames)):
+            if colNames[i][0] == "x":
+                if colNames[i] in rowNames:
+
+                    index = rowNames.index(colNames[i])
+                    answer = (
+                        answer
+                        + colNames[i]
+                        + " = "
+                        + str(round(table[index, table.shape[1] - 1]))
+                        + ", "
+                    )
+
+                else:
+                    answer = answer + colNames[i] + " = 0, "
+
+        print(answer)
+        # print minimize
+    else:
+        for i in range(len(colNames)):
+            if colNames[i][0] == "s":
+                answer = (
+                    answer
+                    + colNames[i]
+                    + " = "
+                    + str(round(table[table.shape[0] - 1, i]))
+                    + ", "
+                )
+
+        print(answer)
+
+
 def simplex(constraints, answers, slacks, profit, goal="maximize"):
-    table, headers = create_table(constraints, answers, slacks, profit)
+    table, headers = create_table(constraints, answers, slacks, profit, goal)
     print_table(table, headers)
 
     while np.min(table[table.shape[0] - 1]) < 0:
@@ -106,26 +158,25 @@ def simplex(constraints, answers, slacks, profit, goal="maximize"):
         table = row_operation(table, pivot_idx)
         print_table(table, headers)
 
-    colNames, rowNames = headers
+    print_answer(headers, table, goal)
+    # answer = "Answer: "
+    # for i in range(len(colNames)):
+    #     if colNames[i][0] == "x":
+    #         if colNames[i] in rowNames:
 
-    answer = "Answer: "
-    for i in range(len(colNames)):
-        if colNames[i][0] == "x":
-            if colNames[i] in rowNames:
+    #             index = rowNames.index(colNames[i])
+    #             answer = (
+    #                 answer
+    #                 + colNames[i]
+    #                 + " = "
+    #                 + str(round(table[index, table.shape[1] - 1]))
+    #                 + ", "
+    #             )
 
-                index = rowNames.index(colNames[i])
-                answer = (
-                    answer
-                    + colNames[i]
-                    + " = "
-                    + str(round(table[index, table.shape[1] - 1]))
-                    + ", "
-                )
+    #         else:
+    #             answer = answer + colNames[i] + " = 0, "
 
-            else:
-                answer = answer + colNames[i] + " = 0, "
-
-    print(answer)
+    # print(answer)
 
     return table
 
@@ -169,5 +220,21 @@ testAnswer = [600, 225, 1000, 150, 0]
 slacks = [1, 1, 1, -1, -1]
 profit = [3, 4]
 table = simplex(testConstraints, testAnswer, slacks, profit)
+
+# %%
+# minimize
+testConstraints = [[1, 2], [7, 6]]
+testAnswer = [4, 20]
+slacks = [-1, -1]
+profit = [14, 20]
+table = simplex(testConstraints, testAnswer, slacks, profit, "minimize")
+# %%
+# minimize
+testConstraints = [[2, 1], [1, 2]]
+testAnswer = [8, 8]
+slacks = [-1, -1]
+profit = [3, 9]
+table = simplex(testConstraints, testAnswer, slacks, profit, "minimize")
+# %%
 
 # %%
