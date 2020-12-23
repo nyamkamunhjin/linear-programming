@@ -23,9 +23,14 @@ def create_table(constraints, answers, slacks, profit, goal):
     # add columns
     # table = np.c_[table, arr, answers + [0]]
     table = np.c_[table, answers + [0]]
+    print(table)
 
     if goal == "minimize":
         table = np.transpose(table)
+
+        arr = np.eye(table.shape[0])
+        np.fill_diagonal(arr, slacks + [1])
+
         arr[: arr.shape[0] - 1, : arr.shape[1] - 1] = np.negative(
             arr[: arr.shape[0] - 1, : arr.shape[1] - 1]
         )
@@ -67,14 +72,15 @@ def find_pivot(table, headers):
         raise Exception("Unbounded")
 
     b = table[: table.shape[0] - 1, table.shape[1] - 1]
-
     divided_matrix = b / a
+    print(a, b, divided_matrix)
     # print(divided_matrix)
 
     min = max(divided_matrix)
     index = -1
     for i in range(len(divided_matrix)):
-        if divided_matrix[i] > 0 and divided_matrix[i] < min:
+        print(divided_matrix[i])
+        if divided_matrix[i] > 0 and divided_matrix[i] <= min:
             min = divided_matrix[i]
             index = i
 
@@ -240,5 +246,11 @@ testConstraints = [[0.2, 0.32], [1, 1], [1, 1]]
 testAnswer = [0.25, 1, 1]
 slacks = [-1, -1, 1]
 profit = [80, 60]
-table = simplex(testConstraints, testAnswer, slacks, profit, "maximize")
+table = simplex(testConstraints, testAnswer, slacks, profit, "minimize")
+# %%
+testConstraints = [[-1, 2, 1, 0, 0], [2, 1, 1, 1, 2], [1, -1, 0, 0, 1]]
+testAnswer = [2, 6, 1]
+slacks = [-1, 1, -1]
+profit = [1, 2, 1, -1, 1]
+table = simplex(testConstraints, testAnswer, slacks, profit)
 # %%
