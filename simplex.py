@@ -236,5 +236,9 @@ slacks = [-1, -1]
 profit = [3, 9]
 table = simplex(testConstraints, testAnswer, slacks, profit, "minimize")
 # %%
-
+testConstraints = [[0.2, 0.32], [1, 1], [1, 1]]
+testAnswer = [0.25, 1, 1]
+slacks = [-1, -1, 1]
+profit = [80, 60]
+table = simplex(testConstraints, testAnswer, slacks, profit, "maximize")
 # %%
