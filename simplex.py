@@ -1,4 +1,4 @@
-# %%
+#%%
 
 
 import numpy as np
@@ -132,7 +132,7 @@ def print_answer(headers, table, goal):
                         answer
                         + colNames[i]
                         + " = "
-                        + str(round(table[index, table.shape[1] - 1]))
+                        + str(table[index, table.shape[1] - 1])
                         + ", "
                     )
 
@@ -148,7 +148,7 @@ def print_answer(headers, table, goal):
                     answer
                     + colNames[i]
                     + " = "
-                    + str(round(table[table.shape[0] - 1, i]))
+                    + str(table[table.shape[0] - 1, i])
                     + ", "
                 )
 
@@ -253,4 +253,10 @@ testAnswer = [2, 6, 1]
 slacks = [-1, 1, -1]
 profit = [1, 2, 1, -1, 1]
 table = simplex(testConstraints, testAnswer, slacks, profit)
+#%%
+testConstraints = [[1, -1, 2, 1, 5], [2, -1, 1, -1, 5], [1, 0, 1, 2, 6]]
+testAnswer = [5, 5, 6]
+slacks = [-1, -1, -1]
+profit = [1, 3, -1, -1, -1]
+table = simplex(testConstraints, testAnswer, slacks, profit, "minimize")
 # %%

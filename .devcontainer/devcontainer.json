@@ -1,0 +1,10 @@
+{
+  "name": "PYTHON ENV",
+  "dockerFile": "../Dockerfile",
+  // "appPort": [5000],
+  // "runArgs": [-u],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": ["ms-python.python"]
+}
